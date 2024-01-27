@@ -4,17 +4,19 @@
 #include <iostream>
 
 int main() {
+    // Open the .si file
     std::ifstream inputFile("example.si");
     if (!inputFile.is_open()) {
         std::cerr << "Error opening input file\n";
         return 1;
     }
 
-    std::string input((std::istreambuf_iterator<char>(inputFile)),
-                      (std::istreambuf_iterator<char>()));
+    // Create a Lexer with the ifstream
+    Lexer lexer(inputFile);
+
+    // Close the file
     inputFile.close();
 
-    Lexer lexer(input.c_str());
     Token token;
     do {
         token = lexer.getNextToken();

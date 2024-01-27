@@ -2,7 +2,7 @@
 #define LEXER_H
 
 #include <llvm/ADT/StringRef.h>
-
+#include <fstream>
 enum TokenKind {
     tok_eof = -1,
     tok_identifier = -2,
@@ -34,16 +34,14 @@ class Lexer {
     const char *start;
 
 public:
-    explicit Lexer(const char *input);
+    explicit Lexer(std::ifstream &inputFile);
 
     Token getNextToken();
 
 private:
     Token identifier();
-
     Token integer();
-
     Token symbol();
 };
 
-#endif // LEXER_H
+#endif //LEXER_H

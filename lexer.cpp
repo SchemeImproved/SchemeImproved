@@ -5,7 +5,16 @@ Token::Token(TokenKind kind, llvm::StringRef value) : kind(kind), value(value) {
 
 Token::Token() : kind(tok_eof), value("") {}
 
-Lexer::Lexer(const char *input) : pos(input), start(input) {}
+// Updated constructor to take an ifstream
+Lexer::Lexer(std::ifstream &inputFile) {
+    // Read the content of the file into a string
+    std::string input((std::istreambuf_iterator<char>(inputFile)),
+                      (std::istreambuf_iterator<char>()));
+
+    // Initialize pos and start
+    pos = input.c_str();
+    start = pos;
+}
 
 Token Lexer::getNextToken() {
     while (isspace(*pos)) {
