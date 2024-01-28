@@ -25,6 +25,12 @@ private:
     void parsePubPriHelper(Token currentToken);
 
     void parseConstructor();
+
+    void parseCallHelper(Token currentToken);
+
+    void mainHelper();
+
+    void parseFunctionHelper();
 };
 
 #endif // PARSER_H

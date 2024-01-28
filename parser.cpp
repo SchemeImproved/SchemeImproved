@@ -1,8 +1,8 @@
 #include "parser.h"
 #include <fstream>
-#include <vector>
 #include<string>
 #include <llvm/Support/ErrorHandling.h>
+
 
 std::ofstream out("output.cpp");
 
@@ -12,174 +12,131 @@ void write(std::string str) {
     out << str;
 }
 
+Token token;
+
 void Parser::parse() {
-    while (true) {
-        Token token = lexer.getNextToken();
-        if (token.kind == tok_eof) {
+    token = lexer.getNextToken();
+    switch (token.kind) {
+        case tok_open_paren:
             break;
-        } else if (token.kind == tok_newline) {
-            continue;
-        } else if (token.kind == tok_open_paren) {
-            token = lexer.getNextToken();
-            if (token.kind == tok_identifier && token.value == "class") {
-                parseClass();
-            } else if (token.kind == tok_identifier && token.value == "function") {
-                parseFunction();
-            } else {
-                printf("Unexpected token %s\n", token.value.c_str());
-                llvm::report_fatal_error("Unexpected token @ 24");
-            }
-        } else {
-            printf("Unexpected token %s\n", token.value.c_str());
-            llvm::report_fatal_error("Unexpected token@ 27");
+        case tok_close_paren:
+            return;
+        default:
+            llvm::report_fatal_error("Expected '('");
+    }
+    while (true) {
+        token = lexer.getNextToken();
+        switch (token.kind) {
+            case tok_eof:
+                return;
+            case tok_identifier:
+                if (token.value == "class") {
+                    parseClass();
+                } else if (token.value == "fn") {
+                    parseFunction();
+                }
+//                 else {
+//                    llvm::report_fatal_error("Expected 'class' or 'function' @ 40");
+//                }
         }
     }
-    out.close();
 }
 
 void Parser::parseClass() {
-    write("class ");
-    Token token = lexer.getNextToken();
-    if (token.kind != tok_identifier) {
-        llvm::report_fatal_error("Expected identifier");
-    } else {
-        write(token.value);
-        write("{ \n");
-    }
-    token = lexer.getNextToken();
-    if (token.kind != tok_open_paren) {
-        llvm::report_fatal_error("Expected '('");
-    }
-    token = lexer.getNextToken();
-    if (token.kind == tok_close_paren) {
-        write(" }");
-    } else if (token.kind != tok_identifier && (token.value != "public" || token.value != "private")) {
-        llvm::report_fatal_error("Expected 'public' or 'private'");
-    } else if (token.value == "public") {
-        write("public: \n");
-        parsePubPri();
-        token = lexer.getNextToken();
-        if (token.kind == tok_open_paren) {
-            token = lexer.getNextToken();
-            if (token.value == "private") {
-                write("private: \n");
-                parsePubPri();
-                token = lexer.getNextToken();
-                if (token.kind == tok_close_paren) {
-                    write(" }; \n");
-                } else {
-                    llvm::report_fatal_error("Expected ')'");
-                }
-
-            } else {
-                llvm::report_fatal_error("Expected 'private'");
-            }
-        } else if (token.kind == tok_close_paren) {
-            write(" }; \n");
-        } else {
-            llvm::report_fatal_error("Expected '(' or ')'");
-        }
-    } else if (token.value == "private") {
-        write("private: \n");
-        parsePubPri();
-        token = lexer.getNextToken();
-        if (token.kind == tok_open_paren) {
-            token = lexer.getNextToken();
-            if (token.value == "public") {
-                write("public: \n");
-                parsePubPri();
-                token = lexer.getNextToken();
-                if (token.kind == tok_close_paren) {
-                    write(" }; \n");
-                } else {
-                    llvm::report_fatal_error("Expected ')'");
-                }
-            } else {
-                llvm::report_fatal_error("Expected 'public'");
-            }
-        } else if (token.kind == tok_close_paren) {
-            write(" }; \n");
-        } else {
-            llvm::report_fatal_error("Expected '(' or ')'");
-        }
-    } else {
-        llvm::report_fatal_error("Unexpected token@106");
-    }
-}
-
-void Parser::parsePubPri() {
-    while (true) {
-        Token token = lexer.getNextToken();
-        if (token.kind == tok_close_paren) {
-            write(" \n");
-            token = lexer.getNextToken();
-            if (token.kind == tok_close_paren) {
-                write("\n");
-                break;
-            } else parsePubPriHelper(token);
-        } else if (token.kind == tok_open_paren) {
-            token = lexer.getNextToken();
-            parsePubPriHelper(token);
-        } else {
-            llvm::report_fatal_error("Unexpected token@124");
-        }
-    }
 
 }
-
-void Parser::parsePubPriHelper(Token currentToken) {
-    if (currentToken.kind == tok_identifier && currentToken.value != "method" && currentToken.value != "cMethod") {
-        write(currentToken.value);
-        write(" ");
-        currentToken = lexer.getNextToken();
-        if (currentToken.kind == tok_identifier) {
-            write(currentToken.value);
-            write("; \n");
-        } else {
-            llvm::report_fatal_error("Expected identifier");
-        }
-    } else if (currentToken.value == "method") {
-        parseMethod();
-    } else if (currentToken.value == "cMethod") {
-        parseConstructor();
-    }
-}
-
-
-void Parser::parseMethod() {
-    write("auto ");
-
-}
-
-void Parser::parseConstructor() {
-    Token token = lexer.getNextToken();
-    if (token.kind != tok_identifier) {
-        llvm::report_fatal_error("Expected identifier");
-    } else {
-        write(token.value);
-        write(" (");
-        while (token.kind != tok_close_paren) {
-            token = lexer.getNextToken();
-            if (token.kind == tok_identifier) {
-                write(token.value);
-                write(" ");
-            }
-            if (token.kind == tok_comma) {
-                write(", ");
-            }
-        }
-        parseCall();
-    }
-    write(") { \n");
-}
-
 
 void Parser::parseFunction() {
-    // Implement function parsing logic
-    // ...
+    token = lexer.getNextToken();
+    if (token.kind == tok_identifier) {
+        if (token.value == "main") {
+            mainHelper();
+        } else { parseFunctionHelper(); }
+    }
 }
 
+void Parser::mainHelper() {
+    write("int main ");
+    //consume "main"
+    token = lexer.getNextToken();
+    if (token.kind != tok_open_paren) {
+        llvm::report_fatal_error("Expected '(' @ main");
+    }
+    token = lexer.getNextToken();
+    if (token.kind != tok_close_paren) {
+        llvm::report_fatal_error("Expected ')' @ main");
+    }
+    write("() { \n");
+    token = lexer.getNextToken();
 
-void Parser::parseCall() {
+    if (token.kind == tok_close_paren) {
+        write("return 0;");
+        write("} \n");
+        return;
+    }
+    //(function main () (assign a 1) ( assign b 2))
+    while (true) {
+        parseCallHelper(token);
+        Token next1 = lexer.getNextToken();
+        Token token = lexer.getNextToken();
+        if (next1.kind == tok_close_paren && token.kind == tok_close_paren) {
+            break;
+        }
 
+    }
+    write("return 0;");
+    write("} \n");
+    return;
+}
+
+void Parser::parseCallHelper(Token currentToken) {
+    //current token is token open paren
+    Token a = lexer.getNextToken();
+    if (a.kind == tok_identifier && a.value == "init") {
+        Token b = lexer.getNextToken();
+        Token c = lexer.getNextToken();
+        write(b.value + " " + c.value + " ; \n");
+    } else {
+        Token b = lexer.getNextToken();
+        Token c = lexer.getNextToken();
+        write(b.value + " " + a.value + "" + c.value + "; \n");
+    }
+
+}
+
+void Parser::parseFunctionHelper() {
+    write("void " + token.value);
+    token = lexer.getNextToken();
+    if (token.kind != tok_open_paren) {
+        llvm::report_fatal_error("Expected '(' ");
+    }
+    write("(");
+    token = lexer.getNextToken();
+    if (token.kind == tok_close_paren) {
+        write("() { \n");
+    } else {
+        while (token.kind != tok_close_paren) {
+            write(token.value + " ");
+            token = lexer.getNextToken();
+        }
+        write(") {");
+    }
+
+    token = lexer.getNextToken();
+
+    if (token.kind == tok_close_paren) {
+        write("}");
+        return;
+    }
+    //(function main () (assign a 1) ( assign b 2))
+    while (true) {
+        parseCallHelper(token);
+        Token next1 = lexer.getNextToken();
+        Token token = lexer.getNextToken();
+        if (next1.kind == tok_close_paren && token.kind == tok_close_paren) {
+            break;
+        }
+
+    }
+    write("}");
 }

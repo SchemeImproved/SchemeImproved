@@ -22,11 +22,11 @@ Token Lexer::getNextToken() {
     }
 
     if (isalpha(*pos)) {
-        while (isalnum(*pos) || *pos == '_' || *pos == '*' || *pos == '&')
+        while (isalnum(*pos) || *pos == '_' || *pos == '*' || *pos == '&' || *pos == '.')
             pos++;
         return identifier();
     } else if (isdigit(*pos)) {
-        while (isdigit(*pos))
+        while (isdigit(*pos) || *pos == '.')
             pos++;
         return integer();
     } else if (*pos == '"') {

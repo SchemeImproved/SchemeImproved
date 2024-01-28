@@ -4,24 +4,15 @@
 
 int main() {
     const char *input = R"(
-    (class Cow
-        (private
-            (int age))
-        (public
-            (cMethod Cow (int age, double time)
-)))
+    (fn main()
+        (init double a)
+        (= a 2.0))
+    (fn ca (int a))
+
+
 
     )";
     Lexer lexer(input);
-//    Token token;
-//    do {
-//        token = lexer.getNextToken();
-//        llvm::outs() << "Token: " << token.value << "\n";
-//        llvm::outs()<< "Kind: " << token.kind << "\n";
-//    } while (token.kind != tok_eof);
-//
-//    return 0;
-//}
     Parser parser(lexer);
 
     try {
