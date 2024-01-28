@@ -7,6 +7,12 @@ int main() {
         (private
             (string name)
             (int age))
+          (public
+            (method (Cow (string name) (int age))
+                (= this.name name)
+                (= this.age age))
+            (method (toString)
+                (print "Name: " name ", Age: " age))))
     )";
 
     Lexer lexer(input);
