@@ -1,22 +1,15 @@
 #include "lexer.h"
 #include <llvm/Support/raw_ostream.h>
-#include <fstream>
-#include <iostream>
 
 int main() {
-    // Open the .si file
-    std::ifstream inputFile("example.si");
-    if (!inputFile.is_open()) {
-        std::cerr << "Error opening input file\n";
-        return 1;
-    }
+    const char *input = R"(
+    (class Cow
+        (private
+            (string name)
+            (int age))
+    )";
 
-    // Create a Lexer with the ifstream
-    Lexer lexer(inputFile);
-
-    // Close the file
-    inputFile.close();
-
+    Lexer lexer(input);
     Token token;
     do {
         token = lexer.getNextToken();
