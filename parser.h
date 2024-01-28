@@ -26,6 +26,8 @@ private:
     void parsePublic();
 
     void parsePrivate();
+
+    void parseConstructer();
 };
 
 #endif // PARSER_H

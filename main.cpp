@@ -6,8 +6,8 @@ int main() {
     const char *input = R"(
     (class A
         (public
-            (init int a)
-            (init double b))
+            (cMethod name(int a)
+                (= this.a a)))
         (private
             (init int c)
             (init double d)

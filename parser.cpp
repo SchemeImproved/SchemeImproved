@@ -128,6 +128,9 @@ void Parser::parsePrivate() {
 void Parser::parseCallHelper(const Token &currentToken) {
     //current token is token open paren
     Token a = lexer.getNextToken();
+    if (a.kind == tok_identifier && a.value == "cMethod") {
+        parseConstructer();
+    }
     if (a.kind == tok_identifier && a.value == "init") {
         Token b = lexer.getNextToken();
         Token c = lexer.getNextToken();
@@ -139,6 +142,12 @@ void Parser::parseCallHelper(const Token &currentToken) {
     }
 
 }
+
+void Parser::parseConstructer() {
+    llvm::report_fatal_error("Constructer not supported");
+}
+
+
 
 
 void Parser::parseFunction() {
