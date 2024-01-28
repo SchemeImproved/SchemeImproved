@@ -9,9 +9,7 @@ int main() {
             (int age))
         (public
             (cMethod Cow (int age, double time)
-                (= this->age age)
-                (= this->time time)
-            )
+)))
 
     )";
     Lexer lexer(input);

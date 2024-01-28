@@ -1,5 +1,7 @@
 #include "parser.h"
 #include <fstream>
+#include <vector>
+#include<string>
 #include <llvm/Support/ErrorHandling.h>
 
 std::ofstream out("output.cpp");
@@ -101,7 +103,7 @@ void Parser::parseClass() {
             llvm::report_fatal_error("Expected '(' or ')'");
         }
     } else {
-        llvm::report_fatal_error("Unexpected token");
+        llvm::report_fatal_error("Unexpected token@106");
     }
 }
 
@@ -119,7 +121,7 @@ void Parser::parsePubPri() {
             token = lexer.getNextToken();
             parsePubPriHelper(token);
         } else {
-            llvm::report_fatal_error("Unexpected token");
+            llvm::report_fatal_error("Unexpected token@124");
         }
     }
 
@@ -151,21 +153,33 @@ void Parser::parseMethod() {
 
 void Parser::parseConstructor() {
     Token token = lexer.getNextToken();
-    if (token.type != tok_identifier) {
+    if (token.kind != tok_identifier) {
         llvm::report_fatal_error("Expected identifier");
     } else {
         write(token.value);
         write(" (");
-
+        while (token.kind != tok_close_paren) {
+            token = lexer.getNextToken();
+            if (token.kind == tok_identifier) {
+                write(token.value);
+                write(" ");
+            }
+            if (token.kind == tok_comma) {
+                write(", ");
+            }
+        }
+        parseCall();
     }
-
-    void Parser::parseFunction() {
-        // Implement function parsing logic
-        // ...
-    }
+    write(") { \n");
+}
 
 
-    void Parser::parseCall() {
-        // Implement function/method call parsing logic
-        // ...
-    }
+void Parser::parseFunction() {
+    // Implement function parsing logic
+    // ...
+}
+
+
+void Parser::parseCall() {
+
+}

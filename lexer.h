@@ -16,6 +16,7 @@ enum TokenKind {
     tok_arrow = -10,
     tok_comment = -11,
     tok_dot = -12,
+    tok_comma = -13,
     tok_add = -15,
     tok_sub = -16,
     tok_div = -17,

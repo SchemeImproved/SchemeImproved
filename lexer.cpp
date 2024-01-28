@@ -100,6 +100,10 @@ Token Lexer::getNextToken() {
                     pos++;
                 }
                 return {tok_comment, ""};
+            case ',': {
+                pos++;
+                return {tok_comma, ","};
+            }
         }
     }
 }
