@@ -3,7 +3,7 @@
 
 Token::Token(TokenKind kind, llvm::StringRef value) : kind(kind), value(value) {}
 
-Token::Token() : kind(tok_eof), value("") {}
+Token::Token() : kind(tok_eof), value("") {} // Default constructor
 
 Lexer::Lexer(const char *input) : pos(input), start(input) {}
 
@@ -15,6 +15,7 @@ Token Lexer::getNextToken() {
         }
         pos++;
     }
+
     start = pos;
     if (*pos == '\0') {
         return {tok_eof, ""};  // End of file

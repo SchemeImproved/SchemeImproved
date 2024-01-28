@@ -1,20 +1,31 @@
 #include "lexer.h"
 #include <llvm/Support/raw_ostream.h>
-#include <fstream>
-#include <iostream>
 
 int main() {
-    std::ifstream inputFile("example.si");
-    if (!inputFile.is_open()) {
-        std::cerr << "Error opening input file\n";
-        return 1;
-    }
+    const char *input = R"(
+    (class Cow
+        (private
+            (string name)
+            (int age))
+          (public
+            (method (Cow (string name) (int age))
+                (= this.name name)
+                (= this.age age))
+            (method (toString)
+                (print "Name: " name ", Age: " age))))
+    (function main (void)
+        (Cow* cow1) ;this is a pointer not an obj
+        (Cow* cow2)
 
-    std::string input((std::istreambuf_iterator<char>(inputFile)),
-                      (std::istreambuf_iterator<char>()));
-    inputFile.close();
+        (= Cow1 (new Cow cow1 1)) ;this instantiate a cow obj on the heap
+        (= Cow2 (new Cow cow2 4))
+        (delete cow1)
+        (delete cow2)
+        (= Cow1 nullptr)
+        (= Cow2 nullptr))
+    )";
 
-    Lexer lexer(input.c_str());
+    Lexer lexer(input);
     Token token;
     do {
         token = lexer.getNextToken();
