@@ -4,14 +4,11 @@
 
 int main() {
     const char *input = R"(
-    (class A
-        (public
-            (cMethod name(int a)
-                (= this.a a)))
-        (private
-            (init int c)
-            (init double d)
-))
+    (class A(public(init int a) (= a 1)))
+    (fn main()
+        (init double b)
+        (= b 2.5)
+        )
 
 
 
