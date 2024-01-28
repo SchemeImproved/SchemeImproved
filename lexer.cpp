@@ -8,10 +8,10 @@ Token::Token() : kind(tok_eof), value("") {} // Default constructor
 Lexer::Lexer(const char *input) : pos(input), start(input) {}
 
 Token Lexer::getNextToken() {
-    while (isspace(*pos)) {
+    while (isspace(*pos) || *pos == '\n') {
         if (*pos == '\n') {
             pos++;
-            return {tok_newline, "\n"};
+            continue;
         }
         pos++;
     }

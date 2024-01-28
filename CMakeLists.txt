@@ -12,7 +12,9 @@ include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
 # Add the executable
-add_executable(SchemeImproved main.cpp lexer.cpp lexer.h)
+add_executable(SchemeImproved main.cpp lexer.cpp lexer.h
+        parser.cpp
+        parser.h)
 
 # Link against LLVM
 llvm_map_components_to_libnames(LLVM_LIBRARIES core support)

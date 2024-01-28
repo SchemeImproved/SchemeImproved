@@ -25,7 +25,7 @@ enum TokenKind {
 
 struct Token {
     TokenKind kind;
-    llvm::StringRef value;
+    std::basic_string<char> value;
 
     Token(TokenKind kind, llvm::StringRef value);
 
