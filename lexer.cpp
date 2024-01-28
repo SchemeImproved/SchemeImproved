@@ -18,11 +18,11 @@ Token Lexer::getNextToken() {
 
     start = pos;
     if (*pos == '\0') {
-        return {tok_eof, ""};  // End of file
+        return {tok_eof, ""};
     }
 
     if (isalpha(*pos)) {
-        while (isalnum(*pos) || *pos == '_')
+        while (isalnum(*pos) || *pos == '_' || *pos == '*' || *pos == '&')
             pos++;
         return identifier();
     } else if (isdigit(*pos)) {
@@ -41,6 +41,8 @@ Token Lexer::getNextToken() {
         }
     } else {
         switch (*pos) {
+            default:
+                return symbol();
             case '(':
                 pos++;
                 return {tok_open_paren, "("};
@@ -49,26 +51,55 @@ Token Lexer::getNextToken() {
                 return {tok_close_paren, ")"};
             case '=':
                 pos++;
-                return {tok_equal, "="};
+                if (*pos == '=') {
+                    pos++;
+                    return {tok_equal, "=="};
+                } else {
+                    return {tok_assign, "="};
+                }
             case '-':
                 pos++;
-                if (*pos == '>')
+                if (*pos == '>') {
                     pos++;
-                return {tok_arrow, "->"};
-            case ';':
-                pos++;
-                return {tok_semicolon, ";"};
+                    return {tok_arrow, "->"};
+                } else {
+                    return {tok_sub, "-"};
+                }
             case '.':
                 pos++;
                 return {tok_dot, "."};
+
+            case '+':
+                pos++;
+                return {tok_add, "+"};
             case '*':
                 pos++;
-                return {tok_star, "*"};
+                if (isalpha(*pos)) {
+                    while (isalnum(*pos) || *pos == '_') {
+                        pos++;
+                        return {tok_identifier, llvm::StringRef(start, pos - start)};
+                    }
+                } else {
+                    return {tok_mut, "*"};
+                }
+            case '/':
+                pos++;
+                return {tok_div, "/"};
             case '&':
                 pos++;
-                return {tok_amp, "&"};
-            default:
-                return symbol();
+                if (isalpha(*pos)) {
+                    while (isalnum(*pos) || *pos == '_') {
+                        pos++;
+                        return {tok_identifier, llvm::StringRef(start, pos - start)};
+                    }
+                } else {
+                    llvm::report_fatal_error("Invalid character");
+                }
+            case ';':
+                while (*pos != '\n' && *pos != '\0') {
+                    pos++;
+                }
+                return {tok_comment, ""};
         }
     }
 }

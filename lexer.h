@@ -14,10 +14,13 @@ enum TokenKind {
     tok_newline = -8,
     tok_equal = -9,
     tok_arrow = -10,
-    tok_semicolon = -11,
+    tok_comment = -11,
     tok_dot = -12,
-    tok_star = -13,
-    tok_amp = -14,
+    tok_add = -15,
+    tok_sub = -16,
+    tok_div = -17,
+    tok_mut = -18,
+    tok_assign = -19,
 };
 
 struct Token {
