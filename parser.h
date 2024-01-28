@@ -14,23 +14,18 @@ private:
 
     void parseClass();
 
-    void parseMethod();
 
     void parseFunction();
 
-    void parseCall();
-
-    void parsePubPri();
-
-    void parsePubPriHelper(Token currentToken);
-
-    void parseConstructor();
-
-    void parseCallHelper(Token currentToken);
+    void parseCallHelper(const Token &currentToken);
 
     void mainHelper();
 
     void parseFunctionHelper();
+
+    void parsePublic();
+
+    void parsePrivate();
 };
 
 #endif // PARSER_H

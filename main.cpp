@@ -4,10 +4,14 @@
 
 int main() {
     const char *input = R"(
-    (fn main()
-        (init double a)
-        (= a 2.0))
-    (fn ca (int a))
+    (class A
+        (public
+            (init int a)
+            (init double b))
+        (private
+            (init int c)
+            (init double d)
+))
 
 
 

@@ -8,7 +8,7 @@ std::ofstream out("output.cpp");
 
 Parser::Parser(Lexer &lexer) : lexer(lexer) {}
 
-void write(std::string str) {
+void write(const std::string &str) {
     out << str;
 }
 
@@ -34,17 +34,112 @@ void Parser::parse() {
                     parseClass();
                 } else if (token.value == "fn") {
                     parseFunction();
+                } else {
+                    llvm::report_fatal_error("Expected 'class' or 'function' @ 40");
                 }
-//                 else {
-//                    llvm::report_fatal_error("Expected 'class' or 'function' @ 40");
-//                }
         }
     }
 }
 
 void Parser::parseClass() {
+    write("class ");
+    token = lexer.getNextToken();
+    if (token.kind != tok_identifier) {
+        llvm::report_fatal_error("Expected identifier");
+    } else {
+        write(token.value + " { \n");
+    }
+    token = lexer.getNextToken();
+    if (token.kind == tok_close_paren) {
+        write("}; \n");
+        return;
+    }
+    if (token.kind != tok_open_paren) {
+        llvm::report_fatal_error("Expected '('");
+    }
+    token = lexer.getNextToken();
+    if (token.kind != tok_identifier) {
+        llvm::report_fatal_error("Expected identifier");
+    }
+    if (token.value == "public") {
+        write("public: \n");
+        parsePublic();
+        token = lexer.getNextToken();
+        if (token.kind == tok_close_paren) {
+            write("}; \n");
+            return;
+        } else if (token.kind == tok_open_paren) {
+            token = lexer.getNextToken();
+            if (token.kind == tok_identifier) {
+                if (token.value == "private") {
+                    write("private: \n");
+                    parsePrivate();
+                    token = lexer.getNextToken();
+                    if (token.kind == tok_close_paren) {
+                        write("}; \n");
+                        return;
+                    }
+                } else {
+                    llvm::report_fatal_error("Expected 'public' or 'private' @ 80");
+                }
+            }
+        }
+    } else if (token.value == "private") {
+        write("private: \n");
+        parsePrivate();
+        token = lexer.getNextToken();
+        if (token.kind == tok_close_paren) {
+            write("}; \n");
+            return;
+        }
+    } else {
+        llvm::report_fatal_error("Expected 'public' or 'private'");
+
+    }
+}
+
+void Parser::parsePublic() {
+    token = lexer.getNextToken();
+    while (true) {
+        parseCallHelper(token);
+        Token next1 = lexer.getNextToken();
+        Token token = lexer.getNextToken();
+        if (next1.kind == tok_close_paren && token.kind == tok_close_paren) {
+            break;
+        }
+
+    }
 
 }
+
+void Parser::parsePrivate() {
+    token = lexer.getNextToken();
+    while (true) {
+        parseCallHelper(token);
+        Token next1 = lexer.getNextToken();
+        Token token = lexer.getNextToken();
+        if (next1.kind == tok_close_paren && token.kind == tok_close_paren) {
+            break;
+        }
+
+    }
+}
+
+void Parser::parseCallHelper(const Token &currentToken) {
+    //current token is token open paren
+    Token a = lexer.getNextToken();
+    if (a.kind == tok_identifier && a.value == "init") {
+        Token b = lexer.getNextToken();
+        Token c = lexer.getNextToken();
+        write(b.value + " " + c.value + " ; \n");
+    } else {
+        Token b = lexer.getNextToken();
+        Token c = lexer.getNextToken();
+        write(b.value + " " + a.value + "" + c.value + "; \n");
+    }
+
+}
+
 
 void Parser::parseFunction() {
     token = lexer.getNextToken();
@@ -86,23 +181,8 @@ void Parser::mainHelper() {
     }
     write("return 0;");
     write("} \n");
-    return;
 }
 
-void Parser::parseCallHelper(Token currentToken) {
-    //current token is token open paren
-    Token a = lexer.getNextToken();
-    if (a.kind == tok_identifier && a.value == "init") {
-        Token b = lexer.getNextToken();
-        Token c = lexer.getNextToken();
-        write(b.value + " " + c.value + " ; \n");
-    } else {
-        Token b = lexer.getNextToken();
-        Token c = lexer.getNextToken();
-        write(b.value + " " + a.value + "" + c.value + "; \n");
-    }
-
-}
 
 void Parser::parseFunctionHelper() {
     write("void " + token.value);
@@ -140,3 +220,4 @@ void Parser::parseFunctionHelper() {
     }
     write("}");
 }
+
