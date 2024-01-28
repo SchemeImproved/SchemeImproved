@@ -2,7 +2,7 @@
   (public
     (method (Cow (string name) (int age))
       (= this.name name)
-      (= age this.age age))
+      (= this.age age))
     (method (toString)
       (printf "Name" << name << "age" << age))))
 
